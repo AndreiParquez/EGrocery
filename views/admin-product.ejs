@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="<%= '/css/admin.css' %>">
+    <script async src="https://kit.fontawesome.com/45cb819601.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            height: 300px;width:400px;background-color: #FFFFFF;top:29%;left:38%;position: absolute;border-radius: 10px;
+            text-align: center;
+            padding-top: 20px;
+            box-shadow: rgba(0, 0, 0, 0.285) 0px 5px 15px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            margin-right: 15px;
+            margin-top: -15px;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .textbox{
+            width: 190px;
+        }
+        .cancel {
+            background-color: grey;
+            height: 38px;
+            border-radius: 5px;
+            width:80px;
+            border: none;
+            font-family: "Poppins";
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 30px;
+        }
+        .ok{
+            background-color: rgb(255, 86, 86);
+            height: 38px;
+            border-radius: 5px;
+            width:80px;
+            border: none;
+            font-family: "Poppins";
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 30px;
+        }
+        h2{
+            font-size: 18px;
+            color: rgb(26, 26, 26);
+            text-align: center;
+            width: 100%;
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <h3><span style="color: green;">e</span>Grocery</h3>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/admin"><i class="fa-solid fa-chart-simple"></i>Analytics</a></li>
+                <li class="active"><a href="#"><i class="fa-solid fa-carrot"></i>Products</a></li>
+                <li><a href="/users"><i class="fa-solid fa-user"></i>Users</a></li>
+                <li><a href="/orders"><i class="fa-solid fa-bell-concierge"></i>Orders</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div class="main">
+        <h3>Products</h3>
+        
+        <div style="display: flex;">
+            <div class="container4">
+                <div class="product">
+                    
+                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <button onclick="showAddModal()" class="add"><i class="fa-solid fa-plus"></i>Add Product</button>
+                        <div class="searchcon">
+                            <div class="input-wrapper">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="search-input" placeholder="Search orders..." style="padding-left: 30px;">
+                            </div>
+                         <button id="search-btn" style="padding: 5px 10px;">Search</button>
+                        </div>
+                    </div>
+                        
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product ID</th>
+                                <th>Product Name</th>
+                                <th>Price</th>
+                                <th>Image</th>
+                                <th>Category</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="products-tbody">
+                            <% products.forEach(product => { %>
+                                <tr>
+                                    <td><%= product.product_id %></td>
+                                    <td><%= product.product_name %></td>
+                                    <td>₱ <%= product.product_price %></td>
+                                    
+                                    <td><img src="/uploads/<%= product.product_image %>" alt="<%= product.product_name %>" style="width: 50px; height: 50px;"></td>
+                                    <td><%= product.category_id %></td>
+                                    <td>
+                                        <button onclick="showEditModal('<%= product.product_id %>', '<%= product.product_name %>', '<%= product.product_price %>', '<%= product.product_image %>')" class="edit"><i class="fa-solid fa-pen-to-square"></i>Edit</button>
+                                        
+                                        <button type="submit" class="delete" onclick="showDeleteModal('<%= product.product_id %>')">
+                                            <i class="fa-solid fa-trash"></i>Delete
+                                        </button>
+                                        
+
+                                           
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+                <br><br>
+                <h3>Manage Categories</h3>
+                <div class="cat">
+                
+                <form action="/admin/categories/add" method="POST">
+                    <input type="text" name="name" placeholder="Category Name" required>
+                    <button type="submit" class="addcat"><i class="fa-regular fa-square-plus"></i>Add Category</button>
+                </form>
+                <ul>
+                    <% categories.forEach(category => { %>
+                        <li>
+                            <form action="/admin/categories/edit/<%= category.id %>" method="POST">
+                                <input type="text" name="name" value="<%= category.name %>" required>
+                                <button type="submit" class="save"><i class="fa-regular fa-floppy-disk"></i></button>
+                            </form>
+                        </li>
+                    <% }); %>
+                </ul>
+            </div>
+
+
+
+
+
+
+
+
+            </div>
+        </div>
+    </div>
+    <!-- Delete Modal -->
+    <!-- Delete Modal -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeDeleteModal()">&times;</span>
+        <h2>Delete Product</h2>
+        <p style="font-size: 14px;">Are you sure you want to delete this product?</p>
+        
+            <img src="/images/trash-bin.gif" style="height: 70px;">
+      
+        <form id="deleteForm" action="/delete-product" method="POST">
+            <input type="hidden" id="deleteProductId" name="product_id">
+            <button type="submit" class="ok">Yes</button>
+            <button type="button" class="cancel" onclick="closeDeleteModal()">No</button>
+        </form>
+    </div>
+</div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditModal()">&times;</span>
+            <h2>Edit Product</h2>
+            <form id="editForm" method="post" action="/edit-product" enctype="multipart/form-data">
+                <input type="hidden" id="editProductId" name="product_id">
+                <div class="form-group">
+                    <label for="editProductName">Name</label>
+                    <input type="text" id="editProductName" name="product_name" class="textbox">
+                </div>
+                <div class="form-group">
+                    <label for="editProductPrice">Price</label>
+                    <input type="number" id="editProductPrice" name="product_price" class="textbox">
+                </div>
+                <div class="form-group">
+                    <label for="editProductImage" class="up"><i class="fa-solid fa-upload"></i>Upload Image</label>
+                    <input type="file" id="editProductImage" name="product_image" class="form-control-file">
+                    
+                </div>
+                <div class="form-group">
+                    <label for="category_id">Category: </label>
+
+                    <select name="category_id" required class="drop">
+                        <% categories.forEach(category => { %>
+                            <option value="<%= category.id %>" <%= category.id === products.category_id ? 'selected' : '' %>><%= category.name %></option>
+                        <% }); %>
+                    </select>
+                </div>
+               
+                <button type="submit" class="ok">Save</button>
+            </form>
+        </div>
+    </div>
+
+
+
+    <!-- Add Modal -->
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddModal()">&times;</span>
+            <h2>Add Product</h2>
+            <form id="addForm" method="post" action="/add-product" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="addProductName">Name</label>
+                    <input type="text" id="addProductName" name="product_name" class="textbox">
+                </div>
+                <div class="form-group">
+                    <label for="addProductPrice">Price</label>
+                    <input type="number" id="addProductPrice" name="product_price" class="textbox">
+                </div>
+                <div class="form-group">
+                    <label for="addProductImage" class="up"><i class="fa-solid fa-upload"></i>Upload Image</label>
+                    <input type="file" id="addProductImage" name="product_image" >
+                </div>
+                <div class="form-group">
+                <select name="category_id" required class="drop">
+                    <option value="">Select Category</option>
+                    <% categories.forEach(category => { %>
+                        <option value="<%= category.id %>"><%= category.name %></option>
+                    <% }); %>
+                </select>
+            </div>
+                <button type="submit" class="ok">Add</button>
+            </form>
+        </div>
+    </div>
+
+
+    <div id="toast" class="toast">
+        <img src="/images/yes.png"><p id="message">Success</p>
+    </div>
+
+    <% if (showToast) { %>
+        <script>
+            const pmessage = document.getElementById('message');
+            const message = "<%= message %>";
+           const toast = document.getElementById('toast');
+            pmessage.textContent = message;
+            
+            toast.className = 'toast show';
+            setTimeout(() => { toast.className = toast.className.replace('show', ''); }, 3000);
+        </script>
+    <% } %>
+
+    <script>
+
+function showDeleteModal(productId) {
+        // Set the product ID in the hidden input field of the delete form
+        document.getElementById('deleteProductId').value = productId;
+        
+
+        // Display the delete modal
+        document.getElementById('deleteModal').style.display = 'block';
+    }
+
+    function closeDeleteModal() {
+        // Close the delete modal
+        document.getElementById('deleteModal').style.display = 'none';
+    }
+
+
+
+        function showEditModal(productId, productName, productPrice, productImage) {
+            document.getElementById('editProductId').value = productId;
+            document.getElementById('editProductName').value = productName;
+            document.getElementById('editProductPrice').value = productPrice;
+            // Image input field should be left empty for security reasons, users can upload new images if needed
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        function showAddModal() {
+            document.getElementById('addModal').style.display = 'block';
+        }
+
+        function closeAddModal() {
+            document.getElementById('addModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('editModal')) {
+                closeEditModal();
+            }
+            if (event.target == document.getElementById('addModal')) {
+                closeAddModal();
+            }
+        }
+    </script>
+
+
+<script>
+    document.getElementById('search-btn').addEventListener('click', function() {
+        const query = document.getElementById('search-input').value.toLowerCase();
+        const rows = document.querySelectorAll('#products-tbody tr');
+        
+        rows.forEach(row => {
+            const cells = row.getElementsByTagName('td');
+            let match = false;
+            for (let i = 0; i < cells.length; i++) {
+                if (cells[i].textContent.toLowerCase().includes(query)) {
+                    match = true;
+                    break;
+                }
+            }
+            row.style.display = match ? '' : 'none';
+        });
+    });
+
+    // Optional: Enable search on enter key press
+    document.getElementById('search-input').addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            document.getElementById('search-btn').click();
+        }
+    });
+</script>
+
+</body>
+</html>

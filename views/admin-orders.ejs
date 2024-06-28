@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="<%= '/css/admin.css' %>">
+    <script async src="https://kit.fontawesome.com/45cb819601.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            height: 300px;width:400px;background-color: #FFFFFF;top:29%;left:38%;position: absolute;border-radius: 10px;
+            text-align: center;
+            padding-top: 20px;
+            box-shadow: rgba(0, 0, 0, 0.285) 0px 5px 15px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            margin-right: 15px;
+            margin-top: -15px;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .textbox{
+            width: 190px;
+        }
+        .ok{
+            background-color: rgb(255, 86, 86);
+            height: 38px;
+            border-radius: 5px;
+            width:80px;
+            border: none;
+            font-family: "Poppins";
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 30px;
+        }
+        h2{
+            font-size: 18px;
+            color: rgb(26, 26, 26);
+            text-align: center;
+            width: 100%;
+            margin-left: 20px;
+        }
+       
+
+        
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <h3><span style="color: green;">e</span>Grocery</h3>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/admin"><i class="fa-solid fa-chart-simple"></i>Analytics</a></li>
+                <li><a href="/admin-product"><i class="fa-solid fa-carrot"></i>Products</a></li>
+                <li><a href="users"><i class="fa-solid fa-user"></i>Users</a></li>
+                <li   class="active"><a href="/orders"><i class="fa-solid fa-bell-concierge"></i>Orders</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div class="main">
+        <h3>Products</h3>
+        <div style="display: flex;">
+            
+            <div class="container4">
+                <div class="product">
+                    
+                    <h3>Orders</h1>
+                        <div class="searchcon">
+                            <div class="input-wrapper">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="search-input" placeholder="Search orders..." style="padding-left: 30px;">
+                            </div>
+                         <button id="search-btn"  style="padding: 5px 10px;">Search</button>
+                        </div>
+        
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Transation Id</th>
+                                <th>User Id</th>
+                                <th>Product Id</th>
+                                <th>Product Name</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                
+                                <th>Date Ordered</th>
+                                <th>Address</th>
+                                <th>Current Status</th>
+                                <th>Edit Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-tbody">
+                            <% orders.forEach(order => { %>
+                                <tr>
+                                    <td><%= order.transaction_id %></td>
+                                    <td><%= order.user_id %></td>
+                                    <td><%= order.product_id %></td>
+                                    <td><%= order.product_name %></td>
+                                    <td><%= order.product_price %></td>
+                                    <td><%= order.quantity %></td>
+                                    
+                                    <td><%= order.transaction_date %></td>
+                                    <td><%= order.address %></td>
+                                    <td><%= order.status %></td>
+                                    <!-- Inside the <td> element where the Edit button is generated -->
+                                    <td>
+                                        <!-- Edit button with a unique ID -->
+                                        <button class="editbtn" id="editStatusButton_<%= order.transaction_id %>" onclick="openEditStatusModal('<%= order.order_id %>', '<%= order.status %>')">Edit</button>
+                                    </td>
+
+                                   
+                                
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <!-- Add Modal -->
+<div id="editStatusModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeEditStatusModal()">&times;</span>
+        <h2>Edit Order Status</h2>
+        <form id="editStatusForm"   method="post" action="/update-order-status" >
+            <div class="form-group" style="display: flex; justify-content: center;align-items: center;">
+                <input type="hidden" name="orderId" id="orderId">
+                <div class="ordercon">
+                    
+                    <div class="ords"><input type="radio" id="Order Placed" name="status" value="Order Placed">
+                <label for="placed"><img src="/images/shopping-bag.png" class="orderimg">Order Placed</label></div>
+                    <div class="ords">
+                <input type="radio" id="Order Cancelled" name="status" value="Order Cancelled">
+                <label for="cancelled"> <img src="/images/delivery.png" class="orderimg">Order Cancelled</label></div>
+                <div class="ords">
+                <input type="radio" id="Order Delivered" name="status" value="Order Delivered">
+                <label for="delivered"> <img src="/images/delivered (2).png" class="orderimg">Order Delivered</label></div>
+                </div>
+            </div>
+            <button type="submit" class="ok">Update</button>
+        </form>
+    </div>
+</div>
+
+
+
+    <div id="toast" class="toast">
+        <img src="/images/yes.png"><p id="message">Success</p>
+    </div>
+
+    <% if (showToast) { %>
+        <script>
+            const pmessage = document.getElementById('message');
+            const message = "<%= message %>";
+           const toast = document.getElementById('toast');
+            pmessage.textContent = message;
+            
+            toast.className = 'toast show';
+            setTimeout(() => { toast.className = toast.className.replace('show', ''); }, 3000);
+        </script>
+    <% } %>
+
+    <script>
+        function showEditModal(productId, productName, productPrice, productImage) {
+            document.getElementById('editProductId').value = productId;
+            document.getElementById('editProductName').value = productName;
+            document.getElementById('editProductPrice').value = productPrice;
+            // Image input field should be left empty for security reasons, users can upload new images if needed
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        function showAddModal() {
+            document.getElementById('addModal').style.display = 'block';
+        }
+
+        function closeAddModal() {
+            document.getElementById('addModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('editModal')) {
+                closeEditModal();
+            }
+            if (event.target == document.getElementById('addModal')) {
+                closeAddModal();
+            }
+        }
+    </script>
+
+
+<script>
+    // Function to open the edit status modal
+function openEditStatusModal(order_id, currentStatus) {
+    const modal = document.getElementById('editStatusModal');
+    modal.style.display = 'block';
+    console.log(order_id);
+
+    const oid = document.getElementById('orderId');
+    oid.value = order_id;
+
+    console.log(oid.value)
+    
+    // Set the value of the radio button to the current status
+    const statusRadioButton = document.getElementById(currentStatus);
+    if (statusRadioButton) {
+        statusRadioButton.checked = true;
+    }
+}
+
+
+    // Function to close the edit status modal
+    function closeEditStatusModal() {
+        const modal = document.getElementById('editStatusModal');
+        modal.style.display = 'none';
+    }
+
+</script>
+
+
+
+
+
+
+
+
+
+
+<script>
+    document.getElementById('search-btn').addEventListener('click', function() {
+        const query = document.getElementById('search-input').value.toLowerCase();
+        const rows = document.querySelectorAll('#orders-tbody tr');
+        
+        rows.forEach(row => {
+            const cells = row.getElementsByTagName('td');
+            let match = false;
+            for (let i = 0; i < cells.length; i++) {
+                if (cells[i].textContent.toLowerCase().includes(query)) {
+                    match = true;
+                    break;
+                }
+            }
+            row.style.display = match ? '' : 'none';
+        });
+    });
+
+    // Optional: Enable search on enter key press
+    document.getElementById('search-input').addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            document.getElementById('search-btn').click();
+        }
+    });
+</script>
+
+</body>
+</html>

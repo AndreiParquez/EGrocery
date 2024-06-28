@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="<%= '/css/style.css' %>">
+    <script async src="https://kit.fontawesome.com/45cb819601.js" crossorigin="anonymous"></script>
+    <style>
+        /* Optional: Style the iframe container */
+        #map-container {
+            margin-top: 30px;
+
+        }
+        .columns {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .column {
+            flex-basis: 30%;
+            padding: 10px;
+          
+            border-radius: 5px;
+            text-align: center;
+        }
+        .column p{
+            margin: 0;
+            color: rgb(45, 45, 45);
+            font-size: 13px;
+        }
+        .column h2{
+            color: green;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="logo">
+        <h3><span style="color: green;">e</span>Grocery</h3>
+    </div>
+    <nav>
+        <ul>
+            <li class="active"><a href="/home">Home</a></li>
+            <li><a href="#">Products</a></li>
+          
+            <li><a href="#">Contact Us</a></li>
+        </ul>
+    </nav>
+    <div class="leftbar">
+        <div id="search-div">
+            
+            <div class="count"><p><%= cartCount %></p></div>
+            <button id="cart" onclick="window.location.href = '/cart';"><i class="fa-solid fa-cart-shopping"></i></button>
+            <button id="account" onclick="window.location.href = '/profile';"><i class="fa-solid fa-user"></i></button>
+        </div>
+    </div>
+</header>
+<div class="bodycontainer">
+
+
+    <div class="columns">
+        <div class="column">
+            <h2>CONTACT US</h2>
+            <p>For inquiries, please contact us at:</p>
+            <p>Email:
+        </div>
+        <div class="column">
+            <h2>ADDRESS</h2>
+            <p>1234 Street Name</p>
+            <p>City, State, Zip</p>
+        </div>
+        <div class="column">
+            <h2>OPENING HOURS</h2>
+            <p>Monday - Friday: 9am - 5pm</p>
+            <p>Saturday: 10am - 4pm</p>
+        </div>
+    </div>
+    <div id="map-container">
+        <!-- Replace with your iframe code -->
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d17270.86039442968!2d120.96627258154221!3d14.40414729682344!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397d2407b04433f%3A0x779154cd6b3d2d4c!2sBacoor%2C%20Cavite!5e0!3m2!1sen!2sph!4v1719141779458!5m2!1sen!2sph" width="800" height="300" style="border:0;border-radius: 10px;margin-left: 40px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>    </div>
+    
+
+
+       
+    
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script>
+    document.getElementById('search-btn').addEventListener('click', function() {
+        const query = document.getElementById('search-input').value.toLowerCase();
+        const products = document.querySelectorAll('.product-card');
+        
+        products.forEach(product => {
+            const productName = product.querySelector('.p-name').textContent.toLowerCase();
+            if (productName.includes(query)) {
+                product.style.display = 'block';
+            } else {
+                product.style.display = 'none';
+            }
+        });
+    });
+
+    // Optional: Enable search on enter key press
+    document.getElementById('search-input').addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            document.getElementById('search-btn').click();
+        }
+    });
+</script>
+</body>
+</html>

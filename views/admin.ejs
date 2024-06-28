@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet"  href="<%= '/css/admin.css' %>">
+    <script async src="https://kit.fontawesome.com/45cb819601.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <h3><span style="color: green;">e</span>Grocery</h3>
+        </div>
+        <nav> 
+            <ul>
+              <li class="active"><a href="#"><i class="fa-solid fa-chart-simple"></i>Analytics</a></li>
+              <li><a href="/admin-product"><i class="fa-solid fa-carrot"></i>Products</a></li>
+              <li><a href="/users"><i class="fa-solid fa-user"></i>Users</a></li>
+              <li><a href="/orders"><i class="fa-solid fa-bell-concierge"></i>Orders</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div class="main">
+        <h3>Analytics</h3>
+        <div class="overview">
+            <div class="card">
+                <img src="/images/bag.gif">
+                <div class="con">
+                    <p class="count"><%= totalOrders %></span>
+                    <p class="title">Total Orders</span>
+                </div>
+            </div>
+            <div class="card">
+                <img src="/images/avatar.gif">
+                <div class="con">
+                    <p class="count"><%= totalUsers %></span>
+                    <p class="title">Total Costumers</span>
+                </div>
+            </div>
+            <div class="card">
+                <img src="/images/pineapple.gif">
+                <div class="con">
+                    <p class="count"><%= totalProducts %></span>
+                    <p class="title">Total Products</span>
+                </div>
+            </div>
+            <div class="card">
+                <img src="/images/grocery.gif">
+                <div class="con">
+                    <p class="count"><%= totalCategories %></span>
+                    <p class="title">Categories</span>
+                </div>
+
+            </div>
+            <div class="card">
+                <img src="/images/money.gif">
+                <div class="con">
+                    <p class="count">₱ <%= totalSales %></span>
+                    <p class="title">Total Revenue</span>
+                </div>
+            </div>
+            
+        </div>
+
+        <div style="display: flex;">
+
+
+
+
+
+        <div class="container1">
+
+<!-- Add this where you want to display the chart -->
+
+    <canvas id="monthlyOrdersChart"></canvas>
+    
+
+
+            
+        </div>
+
+
+
+<div>
+    <div class="container2">
+        <h3>New Customers</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Address</th>
+                  
+                </tr>
+            </thead>
+            <tbody>
+                <% latestUsers.forEach(user => { %>
+                    <tr>
+                        <td><img src="/profile_images/<%= user.profile_image %>" class="avatar" style="margin-right: 10px;"></td>
+                        <td><%= user.id %></td>
+                        <td><%= user.user %></td>
+                        <td><%= user.address %></td>
+                    
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+
+    </div>
+
+
+
+</div>
+
+
+    </div>
+
+
+
+
+
+    </div>
+
+
+
+
+
+    <!-- Ensure the Chart.js library is included -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Add a canvas element to render the chart -->
+
+
+<script>
+    
+    // Get data from the server-side rendered EJS template
+// Use EJS syntax to render labels
+const labels = [
+        <% labels.forEach(function(label) { %>
+            '<%= label %>',
+        <% }); %>
+    ];
+const data = <%= JSON.stringify(data) %>;
+
+// Create a Chart.js instance
+const ctx = document.getElementById('monthlyOrdersChart').getContext('2d');
+const monthlyOrdersChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: labels,
+        datasets: [{
+            label: 'Monthly Orders',
+            data: data,
+            backgroundColor: '#4CAF50',
+            borderColor: 'green',
+            pointStyle: 'circle',
+            pointRadius: 10,
+            pointHoverRadius: 15
+        }]
+    },
+    options: {
+        responsive: false,
+        plugins: {
+            title: {
+                display: true,
+                text: (ctx) => 'Monthly Orders ',
+                font: {
+                    family: 'Arial',
+                    size: 15,
+                    weight: 'bold',
+                    lineHeight: 1.2
+                }
+            }
+        },
+        scales: {
+            x: {
+                ticks: {
+                    font: {
+                        family: 'Arial',
+                        size: 13,
+                        weight: 'normal',
+                        lineHeight: 1.2
+                    }
+                }
+            },
+            y: {
+                ticks: {
+                    font: {
+                        family: 'Arial',
+                        size: 13,
+                        weight: 'normal',
+                        lineHeight: 1.2
+                    }
+                }
+            }
+        }
+    }
+});
+
+
+</script>
+
+    
+</body>
+</html>

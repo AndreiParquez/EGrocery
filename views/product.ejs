@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        li.active{
+    color: rgb(64, 157, 64);
+}
+
+    </style>
+    <link rel="stylesheet" href="<%= '/css/style.css' %>">
+    <script async src="https://kit.fontawesome.com/45cb819601.js" crossorigin="anonymous"></script>
+    
+</head>
+<body>
+<header>
+    <div class="logo">
+        <h3><span style="color: green;">e</span>Grocery</h3>
+    </div>
+    <nav>
+        <ul>
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="#">Products</a></li>
+          
+            <li><a href="/contact">Contact Us</a></li>
+        </ul>
+    </nav>
+    <div class="leftbar">
+        <div id="search-div">
+            
+            <div class="count"><p><%= cartCount %></p></div>
+            <button id="cart" onclick="window.location.href = '/cart';"><i class="fa-solid fa-cart-shopping"></i></button>
+            <button id="account" onclick="window.location.href = '/profile';"><i class="fa-solid fa-user"></i></button>
+        </div>
+    </div>
+</header>
+<div class="bodycontainer">
+    <div class="product">
+        
+        <div class="hero">
+            <div style="width: 550px;margin: 20px;">
+            <h1 style="font-size: 54px;margin: 0;">Order Your Daily Grocery</h1>
+            <span style="color:green;font-size: 25px;font-weight: bold;margin: 0;">#FreeDelivery</span>
+            </div>
+            <img src="/images/bg.png" class="abs">
+        <div class="searchcon">
+            <div class="input-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-input" placeholder="Search Name..." style="padding-left: 30px;">
+            </div>
+            <button id="search-btn" style="padding: 5px 10px;">Search</button>
+        </div>
+    </div>
+
+
+
+        <div class="card-container1">
+            <% Object.keys(groupedProducts).forEach(category => { %>
+                <h2><%= category %></h2>
+                <div class="card-container">
+                    <% groupedProducts[category].forEach(product => { %>
+                        <div class="product-card">
+                            <img src="/uploads/<%= product.product_image %>" class="card-img-top img-fluid" style="max-width: 100%;" alt="Product Image">
+                            <div class="product-details">
+                                <p class="p-name"><%= product.product_name %></p>
+                                <p class="p-quantity">1 kg</p>
+                                <p class="p-price"><span style="color: rgb(82, 81, 81);font-size: 14px;margin-right: 4px;">₱</span><%= product.product_price %></p>
+                                <form method="post" action="/add_cart">
+                                    <input type="hidden" name="product_id" value="<%= product.product_id %>" />
+                                    <input type="hidden" name="product_name" value="<%= product.product_name %>" />
+                                    <input type="hidden" name="product_price" value="<%= product.product_price %>" />
+                                    <input type="hidden" name="product_image" value="<%= product.product_image %>" />
+                                    <button type="submit" id="addtocart"><i class="fa-solid fa-bag-shopping"></i>Add to Cart</button>
+                                </form>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</div>
+<div class="loadercontainer">
+    <div>
+        <div class="newDiv">
+            <div class="ordernotif">
+                <div class="success-checkmark">
+                    <div class="check-icon">
+                        <span class="icon-line line-tip"></span>
+                        <span class="icon-line line-long"></span>
+                        <div class="icon-circle"></div>
+                        <div class="icon-fix"></div>
+                    </div>
+                </div>
+                <p style="color:#4CAF50;font-weight: bold;margin-top: -12px;font-size: 23px;">Order Successful</p>
+                <p class="prompt">Please wait 10-15 minutes for your order to deliver</p>
+                <center><button onclick="hideLoader()" style="height: 50px;width: 169px; font-size: 16px; background-color: #131313; border-radius: 9px; box-shadow: rgba(0, 0, 0, 0.416) 0px 3px 8px;color: rgb(144, 228, 123);border: none;">Continue</button></center>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script>
+    document.getElementById('search-btn').addEventListener('click', function() {
+        const query = document.getElementById('search-input').value.toLowerCase();
+        const products = document.querySelectorAll('.product-card');
+        
+        products.forEach(product => {
+            const productName = product.querySelector('.p-name').textContent.toLowerCase();
+            if (productName.includes(query)) {
+                product.style.display = 'block';
+            } else {
+                product.style.display = 'none';
+            }
+        });
+    });
+
+    // Optional: Enable search on enter key press
+    document.getElementById('search-input').addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            document.getElementById('search-btn').click();
+        }
+    });
+</script>
+</body>
+</html>

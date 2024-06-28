@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="<%= '/css/admin.css' %>">
+    <script async src="https://kit.fontawesome.com/45cb819601.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            height: 270px;
+            width: 400px;
+            background-color: #FFFFFF;
+            top: 29%;
+            left: 38%;
+            position: absolute;
+            border-radius: 10px;
+            text-align: center;
+            padding-top: 20px;
+            box-shadow: rgba(0, 0, 0, 0.285) 0px 5px 15px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            margin-right: 15px;
+            margin-top: -15px;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .textbox {
+            width: 190px;
+        }
+        .ok {
+            background-color: rgb(255, 86, 86);
+            height: 38px;
+            border-radius: 5px;
+            width: 80px;
+            border: none;
+            font-family: "Poppins";
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 30px;
+        }
+        h2 {
+            font-size: 18px;
+            color: rgb(26, 26, 26);
+            text-align: center;
+            width: 100%;
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <h3><span style="color: green;">e</span>Grocery</h3>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/admin"><i class="fa-solid fa-chart-simple"></i>Analytics</a></li>
+                <li><a href="/admin-product"><i class="fa-solid fa-carrot"></i>Products</a></li>
+                <li class="active"><a href="users"><i class="fa-solid fa-user"></i>Users</a></li>
+                <li><a href="/orders"><i class="fa-solid fa-bell-concierge"></i>Orders</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div class="main">
+        <h3>Users</h3>
+        <div style="display: flex;">
+            <div class="container4">
+                <div class="product">
+                    <h3>Users</h3>
+                    <div class="searchcon">
+                        <div class="input-wrapper">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="search-input" placeholder="Search Name..." style="padding-left: 30px;">
+                        </div>
+                        <button id="search-btn" style="padding: 5px 10px;">Search</button>
+                    </div>
+                   
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Address</th>
+                                <th>Password</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-tbody">
+                            <% latestUsers.forEach(user => { %>
+                                <tr>
+                                    <td><%= user.id %></td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; max-width: 200px;">
+                                            <img src="/profile_images/<%= user.profile_image %>" class="avatar" style="margin-right: 10px;">
+                                            <span style="text-align: left;"><%= user.user %></span>
+                                        </div>
+                                    </td>
+                                    
+                                    <td><%= user.email %></td>
+                                    
+                                    <td><%= user.address %></td>
+                                    <td><%= user.password %></td>
+                                    <td><button class="editbtn" onclick="showEditModal('<%= user.id %>', '<%= user.user %>', '<%= user.email %>', '<%= user.address %>')"><i class="fa-solid fa-user-pen"></i>Edit</button></td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editUserModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditUserModal()">&times;</span>
+            <h2>Edit User</h2>
+            <form id="editUserForm" method="POST" action="/edit-user">
+                <input type="hidden" id="editUserId" name="id">
+                <div>
+                    <label for="editUserName">Name:</label>
+                    <input type="text" id="editUserName" name="name" class="textbox">
+                </div>
+                <div>
+                    <label for="editUserEmail">Email:</label>
+                    <input type="email" id="editUserEmail" name="email" class="textbox">
+                </div>
+                <div>
+                    <label for="editUserAddress">Address:</label>
+                    <input type="text" id="editUserAddress" name="address" class="textbox">
+                </div>
+                <button type="submit" class="ok">Save</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">
+        <img src="/images/yes.png"><p id="message">Success</p>
+    </div>
+
+    <% if (showToast) { %>
+        <script>
+            const pmessage = document.getElementById('message');
+            const message = "<%= message %>";
+            const toast = document.getElementById('toast');
+            pmessage.textContent = message;
+            toast.className = 'toast show';
+            setTimeout(() => { toast.className = toast.className.replace('show', ''); }, 3000);
+        </script>
+    <% } %>
+
+    <script>
+        function showEditModal(userId, userName, userEmail, userAddress) {
+            document.getElementById('editUserId').value = userId;
+            document.getElementById('editUserName').value = userName;
+            document.getElementById('editUserEmail').value = userEmail;
+            document.getElementById('editUserAddress').value = userAddress;
+            document.getElementById('editUserModal').style.display = 'block';
+        }
+
+        function closeEditUserModal() {
+            document.getElementById('editUserModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('editUserModal')) {
+                closeEditUserModal();
+            }
+        }
+
+        document.getElementById('search-btn').addEventListener('click', function() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const rows = document.querySelectorAll('#users-tbody tr');
+            
+            rows.forEach(row => {
+                const cells = row.getElementsByTagName('td');
+                let match = false;
+                for (let i = 0; i < cells.length; i++) {
+                    if (cells[i].textContent.toLowerCase().includes(query)) {
+                        match = true;
+                        break;
+                    }
+                }
+                row.style.display = match ? '' : 'none';
+            });
+        });
+
+        // Optional: Enable search on enter key press
+        document.getElementById('search-input').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                document.getElementById('search-btn').click();
+            }
+        });
+    </script>
+</body>
+</html>
